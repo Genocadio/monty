@@ -53,6 +53,7 @@ void process_line(char *line, size_t line_n, stack_t **stack)
  * printerr - prints an error message
  * @opcode: opcode
  * @present: present
+ * @line_n: line number
  * Return: void
 */
 void printerr(char *opcode, int present, int line_n)
