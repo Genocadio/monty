@@ -84,6 +84,11 @@ int main(int argc, char *argv[])
 				return (EXIT_FAILURE);
 			}
 		}
+		else
+		{
+			fprintf(stderr, "Error: Invalid file name\n");
+			return (EXIT_FAILURE);
+		}
 	}
 	else
 	{
