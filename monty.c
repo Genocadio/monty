@@ -75,18 +75,10 @@ int main(int argc, char *argv[])
 	strcpy(filename, argv[1]);
 	if (strlen(filename) >= 2)
 	{
-		if (strcmp(filename + strlen(filename) - 2, ".m") == 0)
+		file = fopen(argv[1], "r");
+		if (file == NULL)
 		{
-			file = fopen(argv[1], "r");
-			if (file == NULL)
-			{
-				fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
-				return (EXIT_FAILURE);
-			}
-		}
-		else
-		{
-			fprintf(stderr, "Error: Invalid file name\n");
+			fprintf(stderr, "Error: Can't open file %s\n", argv[1]);
 			return (EXIT_FAILURE);
 		}
 	}
