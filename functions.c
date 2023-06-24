@@ -1,5 +1,72 @@
 #include "monty.h"
-#include <stdio.h>
+/**
+ * process_line - processes a line
+ * @line: line
+ * @line_n: line number
+ * @stack: pointer to the stack
+ * Return: void
+*/
+void process_line(char *line, size_t line_n, stack_t **stack)
+{
+	Instruction instructions[] = {
+		{"push", push},
+		{"pall", pall}
+	};
+	int n;
+	char *opcode;
+	char *argument;
+	int i;
+	int num_instructions;
+	int present;
+	size_t opcode_len;
+
+	opcode = strtok(line, " \t\n");
+	argument = strtok(NULL, " \t\n");
+	if (opcode == NULL || strcmp(opcode, "#") == 0)
+		return;
+	opcode_len = strlen(opcode);
+	if (opcode[opcode_len - 1] == '$')
+		opcode[opcode_len - 1] = '\0';
+	num_instructions = sizeof(instructions) / sizeof(instructions[0]);
+	present = 0;
+	for (i = 0; i < num_instructions; i++)
+	{
+		if (strcmp(opcode, instructions[i].opcode) == 0)
+		{
+			if (argument == NULL && strcmp(opcode, "push") == 0)
+			{
+				prnterr(line_n);
+			}
+			if (argument)
+				n = atoi(argument);
+			else
+				n = 0;
+			instructions[i].function(stack, line_n, n);
+			present = 1;
+			break;
+		}
+	}
+	if (!present)
+		printerr(opcode);
+}
+/**
+ * printerr - prints an error message
+ * @opcode: opcode
+ * Return: void
+*/
+void printerr(char *opcode)
+{
+	fprintf(stderr, "unknown instruction %s\n", opcode);
+}
+/**
+ * prnterr - prints an error message
+ * @line_n: line number
+ * Return: void
+*/
+void prnterr(unsigned int line_n)
+{
+	fprintf(stderr, "L%u: usage: push integer\n", line_n);
+}
 /**
  * initialize_stack - initializes the stack
  * @stack: pointer to the stack
@@ -8,126 +75,36 @@
 */
 void initialize_stack(stack_t **stack, FILE *file)
 {
-	Instruction instructions[] = {
-		{"push", push},
-		{"pall", pall}
-		};
 	char *line = NULL;
 	size_t len = 0;
-	size_t read;
-	unsigned int line_number = 0;
-	int i;
-	int n = 0;
-	char *opcode;
-	char *argument;
-	int num_instructions = sizeof(instructions) / sizeof(instructions[0]);
+	ssize_t read;
+	unsigned int line_n = 0;
 
-	while ((read = _getline(&line, &len, file)) != (size_t)-1)
+	while ((read = _getline(&line, &len, file)) != -1)
 	{
-		line_number++;
-		opcode = strtok(line, " \t\n");
-		argument = strtok(NULL, " \t\n");
-		if (opcode == NULL || strcmp(opcode, "#") == 0)
-			continue;
-		if (!is_valid_opcode(opcode, instructions, num_instructions))
-		{
-			fprintf(stderr, "L%d: unknown instruction %s\n", line_number, opcode);
-			exit(EXIT_FAILURE);
-		}
-		if (strcmp(opcode, "push") == 0)
-		{
-			is_valid(opcode, argument);
-			n = atoi(argument);
-		}
-		for (i = 0; i < num_instructions; i++)
-		{
-			if (strcmp(opcode, instructions[i].opcode) == 0)
-			{
-				instructions[i].function(stack, line_number, n);
-				return;
-			}
-		}
+		line_n++;
+		process_line(line, line_n, stack);
 	}
+
+	free(line);
 }
 /**
- * is_valid_opcode - checks if the opcode is valid
- * @opcode: opcode
- * @instructions: instructions
- * @num: number of instructions
- * Return: 1 if valid
+ * process_file - processes a file
+ * @filename: file
+ * Return: void
 */
-int is_valid_opcode(const char *opcode, Instruction *instructions, int num)
+void process_file(const char *filename)
 {
-	int i;
+	stack_t *stack = NULL;
+	FILE *file = fopen(filename, "r");
 
-	for (i = 0; i < num; i++)
+	if (file == NULL)
 	{
-		if (strcmp(opcode, instructions[i].opcode) == 0)
-			return (1);
+		fprintf(stderr, "Failed to open file: %s\n", filename);
+		return;
 	}
-	return (0);
-}
-/**
- * is_valid - checks if the argument is valid
- * @opcode: opcode
- * @argument: argument
- * Return: 1 if valid
-*/
-int is_valid(const char *opcode, const char *argument)
-{
-	if (strcmp(opcode, "push") == 0 && argument == NULL)
-	{
-		fprintf(stderr, "Error: usage: push integer\n");
-		exit(EXIT_FAILURE);
-	}
-	return (strcmp(opcode, "push") == 0 && argument != NULL);
-}
 
-/**
- * _getline - gets a line from a file
- * @lineptr: pointer to the line
- * @n: pointer to the line length
- * @stream: file
- * Return: line length
- */
-ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
-{
-	char *new_ptr;
-	size_t buffer_size = 128;
-	size_t line_length = 0;
-	int next_char;
+	initialize_stack(&stack, file);
 
-	if (lineptr == NULL || n == NULL || stream == NULL)
-	{
-		return (-1);
-	}
-	*lineptr = (char *)malloc(buffer_size);
-	if (*lineptr == NULL)
-	{
-		return (-1);
-	}
-	while ((next_char = fgetc(stream)) != EOF)
-	{
-		(*lineptr)[line_length++] = (char)next_char;
-		if (line_length >= buffer_size)
-		{
-			buffer_size *= 2;
-			new_ptr = (char *)realloc(*lineptr, buffer_size);
-			if (new_ptr == NULL)
-			{
-				return (-1);
-			}
-			*lineptr = new_ptr;
-		}
-		if (next_char == '\n')
-		{
-			break;
-		}
-	}
-	(*lineptr)[line_length] = '\0';
-	if (n != NULL)
-	{
-		*n = line_length;
-	}
-	return ((ssize_t)line_length);
+	fclose(file);
 }

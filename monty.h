@@ -51,5 +51,7 @@ int is_valid_opcode(const char *opcode, Instruction *instructions, int num);
 int is_valid(const char *opcode, const char *argument);
 void pall(stack_t **stack, unsigned int line_number, int n);
 void push(stack_t **stack, unsigned int line_number, int n);
+void printerr(char *opcode);
+void prnterr(unsigned int line_n);
 
 #endif

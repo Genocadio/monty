@@ -38,17 +38,22 @@ void pall(stack_t **stack, unsigned int line_number, int n)
 
 	(void)n;
 	(void)line_number;
-	if (stack == NULL)
+	if (stack == NULL || *stack == NULL)
 	{
-		fprintf(stderr, "Error: Stack is NULL\n");
+		fprintf(stderr, "Error: Stack is empty\n");
 		exit(EXIT_FAILURE);
 	}
 	while (current != NULL)
 	{
 		printf("%d\n", current->n);
 		current = current->next;
+		if (current == *stack)
+		{
+			break;
+		}
 	}
 }
+
 /**
  * main - entry point
  * @argc: number of arguments
@@ -62,12 +67,12 @@ int main(int argc, char *argv[])
 	stack_t *stack = NULL;
 	char filename[100];
 
-	strcpy(filename, argv[1]);
 	if (argc != 2)
 	{
 		fprintf(stderr, "USAGE: monty file\n");
 		return (EXIT_FAILURE);
 	}
+	strcpy(filename, argv[1]);
 	if (strlen(filename) >= 2)
 	{
 		if (strcmp(filename + strlen(filename) - 2, ".m") == 0)
@@ -85,15 +90,58 @@ int main(int argc, char *argv[])
 		fprintf(stderr, "USAGE: monty file\n");
 		return (EXIT_FAILURE);
 	}
-	file = fopen(filename, "r");
-	if (file == NULL)
-	{
-		fprintf(stderr, "Failed to open file: %s\n", filename);
-		return (EXIT_FAILURE);
-	}
 	initialize_stack(&stack, file);
 	free(line);
 	fclose(file);
 	return (EXIT_SUCCESS);
 }
 
+/**
+ * _getline - gets a line from a file
+ * @lineptr: pointer to the line
+ * @n: pointer to the line length
+ * @stream: file
+ * Return: line length
+ */
+ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
+{
+	char *new_ptr;
+	size_t buffer_size = 0;
+	size_t line_length = 0;
+	int next_char;
+
+	if (lineptr == NULL || n == NULL || stream == NULL)
+		return (-1);
+	while ((next_char = fgetc(stream)) != EOF)
+	{
+		if (line_length >= buffer_size)
+		{
+			buffer_size += 128;
+			new_ptr = (char *)realloc(*lineptr, buffer_size);
+			if (new_ptr == NULL)
+			{
+				return (-1);
+			}
+			*lineptr = new_ptr;
+		}
+		(*lineptr)[line_length++] = (char)next_char;
+		if (next_char == '\n')
+		{
+			break;
+		}
+	}
+	(*lineptr)[line_length] = '\0';
+
+	if (n != NULL)
+	{
+		*n = line_length;
+	}
+	if (line_length == 0)
+	{
+		return (-1);
+	}
+	else
+	{
+		return (line_length);
+	}
+}
