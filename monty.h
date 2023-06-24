@@ -53,7 +53,7 @@ int is_valid(const char *opcode, const char *argument);
 void pall(stack_t **stack, unsigned int line_number, int n);
 void push(stack_t **stack, unsigned int line_number, int n);
 void pint(stack_t **stack, unsigned int line_number, int argument);
-void printerr(char *opcode, int);
+void printerr(char *opcode, int present, int line_n);
 int prnterr(unsigned int line_n);
 
 #endif

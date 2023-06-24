@@ -47,7 +47,7 @@ void process_line(char *line, size_t line_n, stack_t **stack)
 			break;
 		}
 	}
-	printerr(opcode, present);
+	printerr(opcode, present, line_n);
 }
 /**
  * printerr - prints an error message
@@ -55,10 +55,10 @@ void process_line(char *line, size_t line_n, stack_t **stack)
  * @present: present
  * Return: void
 */
-void printerr(char *opcode, int present)
+void printerr(char *opcode, int present, int line_n)
 {
 	if (!present)
-		fprintf(stderr, "unknown instrn %s\n", opcode);
+		fprintf(stderr, "L%u: unknown instruction %s\n", line_n, opcode);
 }
 /**
  * prnterr - prints an error message
