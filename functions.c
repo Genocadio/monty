@@ -8,16 +8,17 @@
 */
 void process_line(char *line, size_t line_n, stack_t **stack)
 {
-	Instruction instructions[] = {
+	instrn instrns[] = {
 		{"push", push},
-		{"pall", pall}
+		{"pall", pall},
+		{"pint", pint},
 	};
 	int n;
 	char *opcode;
 	char *argument;
 	int i;
-	int num_instructions;
-	int present;
+	int instrns_n;
+	int present = 0;
 	size_t opcode_len;
 
 	opcode = strtok(line, " \t\n");
@@ -27,11 +28,10 @@ void process_line(char *line, size_t line_n, stack_t **stack)
 	opcode_len = strlen(opcode);
 	if (opcode[opcode_len - 1] == '$')
 		opcode[opcode_len - 1] = '\0';
-	num_instructions = sizeof(instructions) / sizeof(instructions[0]);
-	present = 0;
-	for (i = 0; i < num_instructions; i++)
+	instrns_n = sizeof(instrns) / sizeof(instrns[0]);
+	for (i = 0; i < instrns_n; i++)
 	{
-		if (strcmp(opcode, instructions[i].opcode) == 0)
+		if (strcmp(opcode, instrns[i].opcode) == 0)
 		{
 			if (argument == NULL && strcmp(opcode, "push") == 0)
 			{
@@ -42,7 +42,7 @@ void process_line(char *line, size_t line_n, stack_t **stack)
 				n = atoi(argument);
 			else
 				n = 0;
-			instructions[i].function(stack, line_n, n);
+			instrns[i].function(stack, line_n, n);
 			present = 1;
 			break;
 		}
@@ -58,7 +58,7 @@ void process_line(char *line, size_t line_n, stack_t **stack)
 void printerr(char *opcode, int present)
 {
 	if (!present)
-		fprintf(stderr, "unknown instruction %s\n", opcode);
+		fprintf(stderr, "unknown instrn %s\n", opcode);
 }
 /**
  * prnterr - prints an error message

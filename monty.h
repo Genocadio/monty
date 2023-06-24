@@ -35,22 +35,24 @@ typedef struct instruction_s
 	void (*f)(stack_t **stack, unsigned int line_number);
 } instruction_t;
 /**
- * struct instruction - opcode and its function
+ * struct instrn - opcode and its function
  * @opcode: the opcode
+ * 
  * @function: function to handle the opcode
  */
-typedef struct instruction
+typedef struct instrn
 {
 	char *opcode;
 	void (*function)(stack_t **stack, unsigned int line_number, int argument);
-} Instruction;
+} instrn;
 
 ssize_t _getline(char **lineptr, size_t *n, FILE *stream);
 void initialize_stack(stack_t **stack, FILE *file);
-int is_valid_opcode(const char *opcode, Instruction *instructions, int num);
+int is_valid_opcode(const char *opcode, instrn *instrns, int num);
 int is_valid(const char *opcode, const char *argument);
 void pall(stack_t **stack, unsigned int line_number, int n);
 void push(stack_t **stack, unsigned int line_number, int n);
+void pint(stack_t **stack, unsigned int line_number, int argument);
 void printerr(char *opcode, int);
 int prnterr(unsigned int line_n);
 

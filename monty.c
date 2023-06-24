@@ -142,3 +142,20 @@ ssize_t _getline(char **lineptr, size_t *n, FILE *stream)
 		return (line_length);
 	}
 }
+/**
+ * pint - prints an integer
+ * @stack: pointer to the stack
+ * @line_number: line number
+ * @argument: number
+ * Return: void
+*/
+void pint(stack_t **stack, unsigned int line_number, int argument)
+{
+	(void)argument;
+	if (*stack == NULL)
+	{
+		fprintf(stderr, "L%u: can't pint, stack empty\n", line_number);
+		exit(EXIT_FAILURE);
+	}
+	printf("%d\n", (*stack)->n);
+}
