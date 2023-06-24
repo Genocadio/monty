@@ -36,6 +36,7 @@ void process_line(char *line, size_t line_n, stack_t **stack)
 			if (argument == NULL && strcmp(opcode, "push") == 0)
 			{
 				prnterr(line_n);
+				return;
 			}
 			if (argument)
 				n = atoi(argument);
@@ -46,26 +47,28 @@ void process_line(char *line, size_t line_n, stack_t **stack)
 			break;
 		}
 	}
-	if (!present)
-		printerr(opcode);
+	printerr(opcode, present);
 }
 /**
  * printerr - prints an error message
  * @opcode: opcode
+ * @present: present
  * Return: void
 */
-void printerr(char *opcode)
+void printerr(char *opcode, int present)
 {
-	fprintf(stderr, "unknown instruction %s\n", opcode);
+	if (!present)
+		fprintf(stderr, "unknown instruction %s\n", opcode);
 }
 /**
  * prnterr - prints an error message
  * @line_n: line number
  * Return: void
 */
-void prnterr(unsigned int line_n)
+int prnterr(unsigned int line_n)
 {
 	fprintf(stderr, "L%u: usage: push integer\n", line_n);
+	return (1);
 }
 /**
  * initialize_stack - initializes the stack
